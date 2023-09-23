@@ -29,7 +29,7 @@ phases:
       - dagger version
   build:
     commands:
-      - dagger run fluentci snyk_pipeline
+      - fluentci run snyk_pipeline
   post_build:
     commands:
       - echo Build completed on `date`

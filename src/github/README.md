@@ -43,7 +43,7 @@ jobs:
             sudo mv bin/dagger /usr/local/bin
             dagger version
       - name: Run Dagger Pipelines
-        run: dagger run fluentci snyk_pipeline
+        run: fluentci run snyk_pipeline
 ```
 
 Feel free to edit the template generator at `.fluentci/src/github/config.ts` to your needs.

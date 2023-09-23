@@ -20,7 +20,11 @@ export const test = async (client: Client, src = ".") => {
     .withDirectory("/app", context)
     .withWorkdir("/app")
     .withEnvVariable("SNYK_TOKEN", Deno.env.get("SNYK_TOKEN") || "")
-    .withExec(["test", `--severity-threshold=${SNYK_SEVERITY_THRESHOLD}`]);
+    .withExec([
+      "snyk",
+      "test",
+      `--severity-threshold=${SNYK_SEVERITY_THRESHOLD}`,
+    ]);
 
   const result = await ctr.stdout();
 
@@ -37,6 +41,7 @@ export const iacTest = async (client: Client, src = ".") => {
     .withWorkdir("/app")
     .withEnvVariable("SNYK_TOKEN", Deno.env.get("SNYK_TOKEN") || "")
     .withExec([
+      "snyk",
       "iac",
       "test",
       `--severity-threshold=${SNYK_SEVERITY_THRESHOLD}`,

@@ -34,7 +34,7 @@ steps:
         sudo mv bin/dagger /usr/local/bin
         dagger version
     displayName: Setup Dagger
-  - script: dagger run fluentci snyk_pipeline
+  - script: fluentci run snyk_pipeline
     displayName: Run Dagger Pipelines
 
 ```

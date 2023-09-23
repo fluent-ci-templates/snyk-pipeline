@@ -41,7 +41,7 @@ Generated file:
 tests:
   extends: .dagger
   script:
-    - dagger run fluentci snyk_pipeline
+    - fluentci run snyk_pipeline
 ```
 
 Feel free to edit the template generator at `.fluentci/src/gitlab/config.ts` to your needs.

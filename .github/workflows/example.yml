@@ -5,9 +5,6 @@ on:
   push:
     branches:
       - main
-    paths:
-      - example/**
-      - .github/workflows/example.yml
 jobs:
   tests:
     runs-on: ubuntu-latest
@@ -15,7 +12,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: denoland/setup-deno@v1
         with:
-          deno-version: v1.36
+          deno-version: v1.37
       - name: Setup Fluent CI CLI
         run: deno install -A -r https://cli.fluentci.io -n fluentci
       - name: Setup Dagger
@@ -26,3 +23,5 @@ jobs:
       - name: Run Dagger Pipelines
         run: dagger run deno run -A ../src/dagger/runner.ts iac_test
         working-directory: example
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
