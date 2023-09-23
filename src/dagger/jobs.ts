@@ -17,7 +17,7 @@ export const test = async (client: Client, src = ".") => {
     .pipeline(Job.test)
     .container()
     .from(`snyk/snyk:${SNYK_IMAGE_TAG}`)
-    .withDirectory("/app", context)
+    .withDirectory("/app", context, { exclude })
     .withWorkdir("/app")
     .withEnvVariable("SNYK_TOKEN", Deno.env.get("SNYK_TOKEN") || "")
     .withExec([
@@ -37,7 +37,7 @@ export const iacTest = async (client: Client, src = ".") => {
     .pipeline(Job.iacTest)
     .container()
     .from(`snyk/snyk:${SNYK_IMAGE_TAG}`)
-    .withDirectory("/app", context)
+    .withDirectory("/app", context, { exclude })
     .withWorkdir("/app")
     .withEnvVariable("SNYK_TOKEN", Deno.env.get("SNYK_TOKEN") || "")
     .withExec([
