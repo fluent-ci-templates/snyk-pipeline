@@ -25,3 +25,4 @@ jobs:
         working-directory: example
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+          SNYK_SEVERITY_THRESHOLD: medium
