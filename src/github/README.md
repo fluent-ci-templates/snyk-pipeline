@@ -10,7 +10,7 @@ The following command will generate a `.github/workflows/ci.yml` file in your pr
 fluentci gh init -t snyk_pipeline
 ```
 
-Or, if you already have a `.fluentci` folder (generated from `fluentci init -t deno`) in your project:
+Or, if you already have a `.fluentci` folder (generated from `fluentci init -t snyk`) in your project:
 
 ```bash
 fluentci gh init
