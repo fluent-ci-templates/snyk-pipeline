@@ -21,9 +21,7 @@ jobs:
           sudo mv bin/dagger /usr/local/bin
           dagger version
       - name: Run Dagger Pipelines
-        run: |
-          rm ../deno.lock
-          dagger run deno run -A ../src/dagger/runner.ts iac_test
+        run: dagger run deno run -A ../src/dagger/runner.ts iac_test
         working-directory: example
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
