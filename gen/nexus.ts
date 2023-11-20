@@ -58,12 +58,12 @@ export interface NexusGenFieldTypeNames {
 export interface NexusGenArgTypes {
   Query: {
     iacTest: { // args
-      severityThreshold: string; // String!
+      severityThreshold?: string | null; // String
       src: string; // String!
       token: string; // String!
     }
     test: { // args
-      severityThreshold: string; // String!
+      severityThreshold?: string | null; // String
       src: string; // String!
       token: string; // String!
     }

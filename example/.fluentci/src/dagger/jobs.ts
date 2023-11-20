@@ -1,4 +1,6 @@
-import Client, { connect } from "../../deps.ts";
+import Client, { Directory } from "../../deps.ts";
+import { connect } from "../../sdk/connect.ts";
+import { getDirectory } from "./lib.ts";
 
 export enum Job {
   test = "test",
@@ -10,7 +12,7 @@ export const exclude = [".git", ".fluentci", ".devbox"];
 const SNYK_IMAGE_TAG = Deno.env.get("SNYK_IMAGE_TAG") || "alpine";
 
 export const test = async (
-  src = ".",
+  src: string | Directory | undefined = ".",
   token?: string,
   severityThreshold?: string
 ) => {
@@ -18,7 +20,7 @@ export const test = async (
     Deno.env.get("SNYK_SEVERITY_THRESHOLD") || severityThreshold || "low";
   const SNYK_TOKEN = Deno.env.get("SNYK_TOKEN") || token || "";
   await connect(async (client: Client) => {
-    const context = client.host().directory(src);
+    const context = getDirectory(client, src);
     const ctr = client
       .pipeline(Job.test)
       .container()
@@ -48,7 +50,7 @@ export const iacTest = async (
     Deno.env.get("SNYK_SEVERITY_THRESHOLD") || severityThreshold || "low";
   const SNYK_TOKEN = Deno.env.get("SNYK_TOKEN") || token || "";
   await connect(async (client: Client) => {
-    const context = client.host().directory(src);
+    const context = getDirectory(client, src);
     const ctr = client
       .pipeline(Job.iacTest)
       .container()
