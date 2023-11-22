@@ -1,6 +1,6 @@
-import Client, { Directory } from "../../deps.ts";
+import Client, { Directory, Secret } from "../../deps.ts";
 import { connect } from "../../sdk/connect.ts";
-import { getDirectory } from "./lib.ts";
+import { getDirectory, getSnykToken } from "./lib.ts";
 
 export enum Job {
   test = "test",
@@ -13,12 +13,18 @@ const SNYK_IMAGE_TAG = Deno.env.get("SNYK_IMAGE_TAG") || "alpine";
 
 export const test = async (
   src: string | Directory | undefined = ".",
-  token?: string,
+  token?: string | Secret,
   severityThreshold?: string
 ) => {
   const SNYK_SEVERITY_THRESHOLD =
     Deno.env.get("SNYK_SEVERITY_THRESHOLD") || severityThreshold || "low";
-  const SNYK_TOKEN = Deno.env.get("SNYK_TOKEN") || token || "";
+
+  const secret = getSnykToken(new Client(), token);
+  if (!secret) {
+    console.error("SNYK_TOKEN is not set");
+    Deno.exit(1);
+  }
+
   await connect(async (client: Client) => {
     const context = getDirectory(client, src);
     const ctr = client
@@ -27,7 +33,7 @@ export const test = async (
       .from(`snyk/snyk:${SNYK_IMAGE_TAG}`)
       .withDirectory("/app", context, { exclude })
       .withWorkdir("/app")
-      .withEnvVariable("SNYK_TOKEN", SNYK_TOKEN)
+      .withSecretVariable("SNYK_TOKEN", secret)
       .withExec([
         "snyk",
         "test",
@@ -48,7 +54,12 @@ export const iacTest = async (
 ) => {
   const SNYK_SEVERITY_THRESHOLD =
     Deno.env.get("SNYK_SEVERITY_THRESHOLD") || severityThreshold || "low";
-  const SNYK_TOKEN = Deno.env.get("SNYK_TOKEN") || token || "";
+  const secret = getSnykToken(new Client(), token);
+  if (!secret) {
+    console.error("SNYK_TOKEN is not set");
+    Deno.exit(1);
+  }
+
   await connect(async (client: Client) => {
     const context = getDirectory(client, src);
     const ctr = client
@@ -57,7 +68,7 @@ export const iacTest = async (
       .from(`snyk/snyk:${SNYK_IMAGE_TAG}`)
       .withDirectory("/app", context, { exclude })
       .withWorkdir("/app")
-      .withEnvVariable("SNYK_TOKEN", SNYK_TOKEN)
+      .withSecretVariable("SNYK_TOKEN", secret)
       .withExec([
         "snyk",
         "iac",
