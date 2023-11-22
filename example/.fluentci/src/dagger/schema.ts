@@ -48,6 +48,8 @@ const schema = makeSchema({
 schema.description = JSON.stringify({
   "test.src": "directory",
   "iacTest.src": "directory",
+  "test.token": "secret",
+  "iacTest.token": "secret",
 });
 
 export { schema };
