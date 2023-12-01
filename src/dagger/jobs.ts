@@ -33,8 +33,6 @@ export async function test(
     Deno.exit(1);
   }
 
-  let result = "";
-
   await connect(async (client: Client) => {
     const context = getDirectory(client, src);
     const ctr = client
@@ -50,11 +48,9 @@ export async function test(
         `--severity-threshold=${SNYK_SEVERITY_THRESHOLD}`,
       ]);
 
-    result = await ctr.stdout();
-
-    console.log(result);
+    await ctr.stdout();
   });
-  return result.replace(/(\r\n|\n|\r)/gm, "\\$1");
+  return "Done";
 }
 
 /**
@@ -78,8 +74,6 @@ export async function iacTest(
     Deno.exit(1);
   }
 
-  let result = "";
-
   await connect(async (client: Client) => {
     const context = getDirectory(client, src);
     const ctr = client
@@ -96,9 +90,9 @@ export async function iacTest(
         `--severity-threshold=${SNYK_SEVERITY_THRESHOLD}`,
       ]);
 
-    result = await ctr.stdout();
+    await ctr.stdout();
   });
-  return result.replace(/(\r\n|\n|\r)/gm, "\\$1");
+  return "Done";
 }
 
 export type JobExec = (src?: string) =>
