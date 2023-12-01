@@ -14,7 +14,7 @@ const SNYK_IMAGE_TAG = Deno.env.get("SNYK_IMAGE_TAG") || "alpine";
 /**
  * @function
  * @description Checks projects for open source vulnerabilities and license issues
- * @param {string} src Source directory
+ * @param {string | Directory | undefined} src Source directory
  * @param {string} token Snyk token
  * @param {string} severityThreshold Snyk severity threshold
  * @returns {string}
@@ -60,13 +60,13 @@ export async function test(
 /**
  * @function
  * @description Checks projects for infrastructure as code issues
- * @param {string} src Source directory
+ * @param {string | Directory | undefined} src Source directory
  * @param {string} token Snyk token
  * @param {string} severityThreshold Snyk severity threshold
  * @returns {string}
  */
 export async function iacTest(
-  src = ".",
+  src: string | Directory | undefined = ".",
   token?: string,
   severityThreshold?: string
 ) {
