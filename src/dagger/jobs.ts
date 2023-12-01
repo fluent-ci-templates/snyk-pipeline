@@ -3,7 +3,7 @@ import { connect } from "../../sdk/connect.ts";
 import { getDirectory, getSnykToken } from "./lib.ts";
 
 export enum Job {
-  test = "test",
+  test = "Checks projects for open source vulnerabilities and license issues",
   iacTest = "iac_test",
 }
 
@@ -11,11 +11,19 @@ export const exclude = [".git", ".fluentci", ".devbox"];
 
 const SNYK_IMAGE_TAG = Deno.env.get("SNYK_IMAGE_TAG") || "alpine";
 
-export const test = async (
+/**
+ * @function
+ * @description Checks projects for open source vulnerabilities and license issues
+ * @param {string} src Source directory
+ * @param {string} token Snyk token
+ * @param {string} severityThreshold Snyk severity threshold
+ * @returns {string}
+ */
+export async function test(
   src: string | Directory | undefined = ".",
   token?: string | Secret,
   severityThreshold?: string
-) => {
+): Promise<string> {
   const SNYK_SEVERITY_THRESHOLD =
     Deno.env.get("SNYK_SEVERITY_THRESHOLD") || severityThreshold || "low";
 
@@ -24,6 +32,8 @@ export const test = async (
     console.error("SNYK_TOKEN is not set");
     Deno.exit(1);
   }
+
+  let result = "";
 
   await connect(async (client: Client) => {
     const context = getDirectory(client, src);
@@ -40,18 +50,26 @@ export const test = async (
         `--severity-threshold=${SNYK_SEVERITY_THRESHOLD}`,
       ]);
 
-    const result = await ctr.stdout();
+    result = await ctr.stdout();
 
     console.log(result);
   });
-  return "done";
-};
+  return result.replace(/(\r\n|\n|\r)/gm, "\\$1");
+}
 
-export const iacTest = async (
+/**
+ * @function
+ * @description Checks projects for infrastructure as code issues
+ * @param {string} src Source directory
+ * @param {string} token Snyk token
+ * @param {string} severityThreshold Snyk severity threshold
+ * @returns {string}
+ */
+export async function iacTest(
   src = ".",
   token?: string,
   severityThreshold?: string
-) => {
+) {
   const SNYK_SEVERITY_THRESHOLD =
     Deno.env.get("SNYK_SEVERITY_THRESHOLD") || severityThreshold || "low";
   const secret = getSnykToken(new Client(), token);
@@ -59,6 +77,8 @@ export const iacTest = async (
     console.error("SNYK_TOKEN is not set");
     Deno.exit(1);
   }
+
+  let result = "";
 
   await connect(async (client: Client) => {
     const context = getDirectory(client, src);
@@ -76,12 +96,10 @@ export const iacTest = async (
         `--severity-threshold=${SNYK_SEVERITY_THRESHOLD}`,
       ]);
 
-    const result = await ctr.stdout();
-
-    console.log(result);
+    result = await ctr.stdout();
   });
-  return "done";
-};
+  return result.replace(/(\r\n|\n|\r)/gm, "\\$1");
+}
 
 export type JobExec = (src?: string) =>
   | Promise<string>
