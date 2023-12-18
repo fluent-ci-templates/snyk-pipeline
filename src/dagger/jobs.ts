@@ -17,13 +17,14 @@ const SNYK_IMAGE_TAG = Deno.env.get("SNYK_IMAGE_TAG") || "alpine";
  * @param {string | Directory | undefined} src Source directory
  * @param {string | Secret} token Snyk token
  * @param {string} severityThreshold Snyk severity threshold
- * @returns {string}
+ * @returns {Promise<string>}
  */
 export async function test(
   src: string | Directory | undefined = ".",
   token?: string | Secret,
   severityThreshold?: string
 ): Promise<string> {
+  let result = "";
   const SNYK_SEVERITY_THRESHOLD =
     Deno.env.get("SNYK_SEVERITY_THRESHOLD") || severityThreshold || "low";
 
@@ -48,9 +49,9 @@ export async function test(
         `--severity-threshold=${SNYK_SEVERITY_THRESHOLD}`,
       ]);
 
-    await ctr.stdout();
+    result = await ctr.stdout();
   });
-  return "Done";
+  return result;
 }
 
 /**
@@ -59,13 +60,14 @@ export async function test(
  * @param {string | Directory | undefined} src Source directory
  * @param {string | Secret} token Snyk token
  * @param {string} severityThreshold Snyk severity threshold
- * @returns {string}
+ * @returns {Promise<string>}
  */
 export async function iacTest(
   src: string | Directory | undefined = ".",
   token?: string | Secret,
   severityThreshold?: string
-) {
+): Promise<string> {
+  let result = "";
   const SNYK_SEVERITY_THRESHOLD =
     Deno.env.get("SNYK_SEVERITY_THRESHOLD") || severityThreshold || "low";
   const secret = getSnykToken(new Client(), token);
@@ -90,19 +92,16 @@ export async function iacTest(
         `--severity-threshold=${SNYK_SEVERITY_THRESHOLD}`,
       ]);
 
-    await ctr.stdout();
+    result = await ctr.stdout();
   });
-  return "Done";
+  return result;
 }
 
-export type JobExec = (src?: string) =>
-  | Promise<string>
-  | ((
-      src?: string,
-      options?: {
-        ignore: string[];
-      }
-    ) => Promise<string>);
+export type JobExec = (
+  src?: string | Directory,
+  token?: string | Secret,
+  severityThreshold?: string
+) => Promise<string>;
 
 export const runnableJobs: Record<Job, JobExec> = {
   [Job.test]: test,

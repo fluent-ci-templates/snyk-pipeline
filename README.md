@@ -51,25 +51,26 @@ dagger mod install github.com/fluent-ci-templates/snyk-pipeline@mod
 | test     | Checks projects for open source vulnerabilities and license issues |
 | iac_test | Checks infrastructure as code for security issues                  |
 
-```graphql
-iacTest(
-  severityThreshold: String!, 
-  src: String!, 
-  token: String!
-): String
-
+```typescript
 test(
-  severityThreshold: String!, 
-  src: String!, 
-  token: String!
-): String
+  src: string | Directory | undefined = ".",
+  token?: string | Secret,
+  severityThreshold?: string
+): Promise<string>
+
+iacTest(
+  src: string | Directory | undefined = ".",
+  token?: string | Secret,
+  severityThreshold?: string
+): Promise<string>
 ```
+
 ## Programmatic usage
 
 You can also use this pipeline programmatically:
 
 ```ts
-import { test } from "https://pkg.fluentci.io/snyk_pipeline@v0.3.0/mod.ts";
+import { test } from "https://pkg.fluentci.io/snyk_pipeline@v0.4.0/mod.ts";
 
 await test();
 ```
