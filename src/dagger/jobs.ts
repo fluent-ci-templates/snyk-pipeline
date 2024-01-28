@@ -1,5 +1,4 @@
-import Client, { Directory, Secret } from "../../deps.ts";
-import { connect } from "../../sdk/connect.ts";
+import { Directory, Secret, dag } from "../../deps.ts";
 import { getDirectory, getSnykToken } from "./lib.ts";
 
 export enum Job {
@@ -24,33 +23,30 @@ export async function test(
   token?: string | Secret,
   severityThreshold?: string
 ): Promise<string> {
-  let result = "";
   const SNYK_SEVERITY_THRESHOLD =
     Deno.env.get("SNYK_SEVERITY_THRESHOLD") || severityThreshold || "low";
 
-  const secret = getSnykToken(new Client(), token);
+  const secret = await getSnykToken(dag, token);
   if (!secret) {
     console.error("SNYK_TOKEN is not set");
     Deno.exit(1);
   }
 
-  await connect(async (client: Client) => {
-    const context = getDirectory(client, src);
-    const ctr = client
-      .pipeline(Job.test)
-      .container()
-      .from(`snyk/snyk:${SNYK_IMAGE_TAG}`)
-      .withDirectory("/app", context, { exclude })
-      .withWorkdir("/app")
-      .withSecretVariable("SNYK_TOKEN", secret)
-      .withExec([
-        "snyk",
-        "test",
-        `--severity-threshold=${SNYK_SEVERITY_THRESHOLD}`,
-      ]);
+  const context = await getDirectory(dag, src);
+  const ctr = dag
+    .pipeline(Job.test)
+    .container()
+    .from(`snyk/snyk:${SNYK_IMAGE_TAG}`)
+    .withDirectory("/app", context, { exclude })
+    .withWorkdir("/app")
+    .withSecretVariable("SNYK_TOKEN", secret)
+    .withExec([
+      "snyk",
+      "test",
+      `--severity-threshold=${SNYK_SEVERITY_THRESHOLD}`,
+    ]);
 
-    result = await ctr.stdout();
-  });
+  const result = await ctr.stdout();
   return result;
 }
 
@@ -67,33 +63,30 @@ export async function iacTest(
   token?: string | Secret,
   severityThreshold?: string
 ): Promise<string> {
-  let result = "";
   const SNYK_SEVERITY_THRESHOLD =
     Deno.env.get("SNYK_SEVERITY_THRESHOLD") || severityThreshold || "low";
-  const secret = getSnykToken(new Client(), token);
+  const secret = await getSnykToken(dag, token);
   if (!secret) {
     console.error("SNYK_TOKEN is not set");
     Deno.exit(1);
   }
 
-  await connect(async (client: Client) => {
-    const context = getDirectory(client, src);
-    const ctr = client
-      .pipeline(Job.iacTest)
-      .container()
-      .from(`snyk/snyk:${SNYK_IMAGE_TAG}`)
-      .withDirectory("/app", context, { exclude })
-      .withWorkdir("/app")
-      .withSecretVariable("SNYK_TOKEN", secret)
-      .withExec([
-        "snyk",
-        "iac",
-        "test",
-        `--severity-threshold=${SNYK_SEVERITY_THRESHOLD}`,
-      ]);
+  const context = await getDirectory(dag, src);
+  const ctr = dag
+    .pipeline(Job.iacTest)
+    .container()
+    .from(`snyk/snyk:${SNYK_IMAGE_TAG}`)
+    .withDirectory("/app", context, { exclude })
+    .withWorkdir("/app")
+    .withSecretVariable("SNYK_TOKEN", secret)
+    .withExec([
+      "snyk",
+      "iac",
+      "test",
+      `--severity-threshold=${SNYK_SEVERITY_THRESHOLD}`,
+    ]);
 
-    result = await ctr.stdout();
-  });
+  const result = await ctr.stdout();
   return result;
 }
 
