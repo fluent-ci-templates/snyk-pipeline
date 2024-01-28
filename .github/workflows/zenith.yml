@@ -13,7 +13,7 @@ jobs:
       - uses: actions/checkout@v2
       - name: Setup Dagger Zenith
         run: |
-          curl -L https://dl.dagger.io/dagger/install.sh | DAGGER_VERSION=0.9.3 sh
+          curl -L https://dl.dagger.io/dagger/install.sh | DAGGER_VERSION=0.9.7 sh
           sudo mv bin/dagger /usr/local/bin
           dagger version
       - name: Setup Snyk Token
@@ -23,5 +23,7 @@ jobs:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
       - name: Run Dagger Pipelines
         run: |
-          dagger query --doc iac_test.gql
+          dagger call iacTest --src . --token SNYK_TOKEN --severity-threshold medium
         working-directory: example
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
