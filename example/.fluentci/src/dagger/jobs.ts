@@ -1,4 +1,8 @@
-import { Directory, Secret, dag } from "../../deps.ts";
+/**
+ * @module snyk
+ * @description This module provides a set of functions to scan vulnerabilities in projects using Snyk
+ */
+import { Directory, Secret, dag, exit, env } from "../../deps.ts";
 import { getDirectory, getSnykToken } from "./lib.ts";
 
 export enum Job {
@@ -8,9 +12,11 @@ export enum Job {
 
 export const exclude = [".git", ".fluentci", ".devbox"];
 
-const SNYK_IMAGE_TAG = Deno.env.get("SNYK_IMAGE_TAG") || "alpine";
+const SNYK_IMAGE_TAG = env.get("SNYK_IMAGE_TAG") || "alpine";
 
 /**
+ * Checks projects for open source vulnerabilities and license issues
+ *
  * @function
  * @description Checks projects for open source vulnerabilities and license issues
  * @param {string | Directory | undefined} src Source directory
@@ -24,15 +30,16 @@ export async function test(
   severityThreshold?: string
 ): Promise<string> {
   const SNYK_SEVERITY_THRESHOLD =
-    Deno.env.get("SNYK_SEVERITY_THRESHOLD") || severityThreshold || "low";
+    env.get("SNYK_SEVERITY_THRESHOLD") || severityThreshold || "low";
 
-  const secret = await getSnykToken(dag, token);
+  const secret = await getSnykToken(token);
   if (!secret) {
     console.error("SNYK_TOKEN is not set");
-    Deno.exit(1);
+    exit(1);
+    return "";
   }
 
-  const context = await getDirectory(dag, src);
+  const context = await getDirectory(src);
   const ctr = dag
     .pipeline(Job.test)
     .container()
@@ -46,11 +53,12 @@ export async function test(
       `--severity-threshold=${SNYK_SEVERITY_THRESHOLD}`,
     ]);
 
-  const result = await ctr.stdout();
-  return result;
+  return ctr.stdout();
 }
 
 /**
+ * Checks projects for infrastructure as code issues
+ *
  * @function
  * @description Checks projects for infrastructure as code issues
  * @param {string | Directory | undefined} src Source directory
@@ -65,13 +73,14 @@ export async function iacTest(
 ): Promise<string> {
   const SNYK_SEVERITY_THRESHOLD =
     Deno.env.get("SNYK_SEVERITY_THRESHOLD") || severityThreshold || "low";
-  const secret = await getSnykToken(dag, token);
+  const secret = await getSnykToken(token);
   if (!secret) {
     console.error("SNYK_TOKEN is not set");
-    Deno.exit(1);
+    exit(1);
+    return "";
   }
 
-  const context = await getDirectory(dag, src);
+  const context = await getDirectory(src);
   const ctr = dag
     .pipeline(Job.iacTest)
     .container()
@@ -86,8 +95,7 @@ export async function iacTest(
       `--severity-threshold=${SNYK_SEVERITY_THRESHOLD}`,
     ]);
 
-  const result = await ctr.stdout();
-  return result;
+  return ctr.stdout();
 }
 
 export type JobExec = (

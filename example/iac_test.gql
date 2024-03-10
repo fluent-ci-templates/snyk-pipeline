@@ -1,5 +1,0 @@
-{
-  snyk {
-    iacTest(src: ".", token: "SNYK_TOKEN", severityThreshold: "medium")
-  }
-}

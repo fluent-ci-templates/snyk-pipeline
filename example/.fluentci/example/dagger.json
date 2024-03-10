@@ -1,5 +1,0 @@
-{
-  "root": "",
-  "name": "snyk",
-  "sdkRuntime": "tsiry/dagger-sdk-deno"
-}
