@@ -6,8 +6,15 @@ pub fn test(args: String) -> FnResult<String> {
     let stdout = dag()
         .pipeline("test")?
         .pkgx()?
-        .with_packages(vec!["snyk"])?
-        .with_exec(vec!["snyk", "test", &args])?
+        .with_exec(vec![
+            "pkgx",
+            "+nodejs.org",
+            "+bun",
+            "bunx",
+            "snyk",
+            "test",
+            &args,
+        ])?
         .stdout()?;
     Ok(stdout)
 }
@@ -17,8 +24,16 @@ pub fn iac_test(args: String) -> FnResult<String> {
     let stdout = dag()
         .pipeline("iac test")?
         .pkgx()?
-        .with_packages(vec!["snyk"])?
-        .with_exec(vec!["snyk", "iac", "test", &args])?
+        .with_exec(vec![
+            "pkgx",
+            "+nodejs.org",
+            "+bun",
+            "bunx",
+            "snyk",
+            "iac",
+            "test",
+            &args,
+        ])?
         .stdout()?;
     Ok(stdout)
 }
