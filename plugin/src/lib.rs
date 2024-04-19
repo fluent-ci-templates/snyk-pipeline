@@ -9,7 +9,7 @@ pub fn test(args: String) -> FnResult<String> {
         .with_exec(vec![
             "pkgx",
             "+nodejs.org",
-            "+bun",
+            "+bun.sh",
             "bunx",
             "snyk",
             "test",
@@ -27,7 +27,7 @@ pub fn iac_test(args: String) -> FnResult<String> {
         .with_exec(vec![
             "pkgx",
             "+nodejs.org",
-            "+bun",
+            "+bun.sh",
             "bunx",
             "snyk",
             "iac",
