@@ -16,6 +16,7 @@ jobs:
           wasm: true
           pipeline: .
           args: |
+            setup
             iac_test --severity-threshold=medium
           working-directory: example
         env:
